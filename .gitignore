@@ -1,0 +1,17 @@
+# Generated files
+my_cards_enriched.json
+my_cards_visualization.md
+
+# VSCode local settings
+.vscode
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv

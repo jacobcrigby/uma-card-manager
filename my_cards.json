@@ -1,0 +1,380 @@
+[
+  {
+    "name": "Silence Suzuka",
+    "type": 0,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Tokai Teio",
+    "type": 0,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Gold Ship",
+    "type": 0,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Eishin Flash",
+    "type": 0,
+    "rarity": 2,
+    "lb": 2
+  },
+  {
+    "name": "Gold City",
+    "type": 0,
+    "rarity": 3,
+    "lb": 2
+  },
+  {
+    "name": "Shinko Windy",
+    "type": 0,
+    "rarity": 2,
+    "lb": 1
+  },
+  {
+    "name": "Sweep Tosho",
+    "type": 0,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Narita Taishin",
+    "type": 0,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Nishino Flower",
+    "type": 0,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "King Halo",
+    "type": 0,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Twin Turbo",
+    "type": 0,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Kitasan Black",
+    "type": 0,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Silence Suzuka",
+    "type": 1,
+    "rarity": 3,
+    "lb": 2
+  },
+  {
+    "name": "Mejiro McQueen",
+    "type": 1,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Seiun Sky",
+    "type": 1,
+    "rarity": 3,
+    "lb": 2
+  },
+  {
+    "name": "Tamamo Cross",
+    "type": 1,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Mayano Top Gun",
+    "type": 1,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Manhattan Cafe",
+    "type": 1,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Rice Shower",
+    "type": 1,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Super Creek",
+    "type": 1,
+    "rarity": 3,
+    "lb": 3
+  },
+  {
+    "name": "Zenno Rob Roy",
+    "type": 1,
+    "rarity": 2,
+    "lb": 1
+  },
+  {
+    "name": "Tosen Jordan",
+    "type": 1,
+    "rarity": 2,
+    "lb": 1
+  },
+  {
+    "name": "Satono Diamond",
+    "type": 1,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Sakura Chiyono O",
+    "type": 1,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Vodka",
+    "type": 2,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Daiwa Scarlet",
+    "type": 2,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Hishi Amazon",
+    "type": 2,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Agnes Digital",
+    "type": 2,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Biwa Hayahide",
+    "type": 2,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Mihono Bourbon",
+    "type": 2,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Mejiro Ryan",
+    "type": 2,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Rice Shower",
+    "type": 2,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Winning Ticket",
+    "type": 2,
+    "rarity": 3,
+    "lb": 2
+  },
+  {
+    "name": "Nishino Flower",
+    "type": 2,
+    "rarity": 2,
+    "lb": 0
+  },
+  {
+    "name": "Daitaku Helios",
+    "type": 2,
+    "rarity": 2,
+    "lb": 3
+  },
+  {
+    "name": "Yaeno Muteki",
+    "type": 2,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Grass Wonder",
+    "type": 3,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Air Groove",
+    "type": 3,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Yukino Bijin",
+    "type": 3,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Ines Fujin",
+    "type": 3,
+    "rarity": 3,
+    "lb": 3
+  },
+  {
+    "name": "Winning Ticket",
+    "type": 3,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Seeking the Pearl",
+    "type": 3,
+    "rarity": 2,
+    "lb": 1
+  },
+  {
+    "name": "Haru Urara",
+    "type": 3,
+    "rarity": 3,
+    "lb": 4
+  },
+  {
+    "name": "Meisho Doto",
+    "type": 3,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Nice Nature",
+    "type": 3,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Matikanetannhauser",
+    "type": 3,
+    "rarity": 3,
+    "lb": 3
+  },
+  {
+    "name": "Ikuno Dictus",
+    "type": 3,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Fuji Kiseki",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Daiwa Scarlet",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Fine Motion",
+    "type": 4,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
+    "name": "Mihono Bourbon",
+    "type": 4,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Yukino Bijin",
+    "type": 4,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Agnes Tachyon",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Marvelous Sunday",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Matikanefukukitaru",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Mejiro Dober",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Mejiro Dober",
+    "type": 4,
+    "rarity": 3,
+    "lb": 3
+  },
+  {
+    "name": "Nice Nature",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Ikuno Dictus",
+    "type": 4,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Mejiro Ardan",
+    "type": 4,
+    "rarity": 2,
+    "lb": 1
+  },
+  {
+    "name": "Tazuna Hayakawa",
+    "type": 5,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Aio Kiryuin",
+    "type": 5,
+    "rarity": 2,
+    "lb": 4
+  },
+  {
+    "name": "Riko Kashimoto",
+    "type": 5,
+    "rarity": 3,
+    "lb": 0
+  }
+]
