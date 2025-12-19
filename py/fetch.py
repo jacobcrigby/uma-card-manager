@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 """Fetch updated tierlist data from the internet."""
 
 from __future__ import annotations
@@ -7,6 +9,8 @@ import json
 import sys
 from pathlib import Path
 from typing import Any
+
+from util import save_json
 
 URL = "https://uma.moe/assets/data/precomputed-tierlist.json"
 
@@ -62,10 +66,8 @@ def run(args: argparse.Namespace) -> int:
 	
 	# Save to file
 	try:
-		with open(args.output, "w", encoding="utf-8") as f:
-			json.dump(parsed, f, indent=2, ensure_ascii=False)
-			f.write("\n")
-			print(f"Saved updated tierlist to {args.output}")
+		save_json(args.output, parsed)
+		print(f"Saved updated tierlist to {args.output}")
 
 		# After fetching, re-enrich the local card list using the new tierlist
 		try:

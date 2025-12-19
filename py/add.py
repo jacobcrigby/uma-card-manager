@@ -1,10 +1,13 @@
+# SPDX-License-Identifier: MIT
+
 """Add new cards to the user's collection."""
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import Any, List, TypedDict, cast
+from typing import Any, List, cast
+
+from util import UserCard, load_json, save_json
 
 
 def parse_rarity(value: str) -> int:
@@ -44,37 +47,6 @@ def parse_type(value: str) -> int:
 		raise argparse.ArgumentTypeError(
 			f"Invalid type '{value}'. Use spd, sta, pow, gut, wit, fri, or 0-5"
 		)
-
-
-class UserCard(TypedDict):
-	"""Structure of a card in the user's collection."""
-	name: str
-	type: int
-	rarity: int
-	lb: int
-
-
-def load_json(filepath: Path) -> Any:
-	"""Load JSON from a file."""
-	try:
-		with open(filepath, "r", encoding="utf-8") as f:
-			return json.load(f)
-	except FileNotFoundError:
-		print(f"error: file not found: {filepath}", file=sys.stderr)
-		sys.exit(1)
-	except json.JSONDecodeError as e:
-		print(f"error: invalid JSON in {filepath}: {e}", file=sys.stderr)
-		sys.exit(1)
-
-
-def save_json(filepath: Path, data: Any, pretty: bool = True) -> None:
-	"""Save data to a JSON file."""
-	with open(filepath, "w", encoding="utf-8") as f:
-		if pretty:
-			json.dump(data, f, indent=2, ensure_ascii=False)
-			f.write("\n")
-		else:
-			json.dump(data, f, ensure_ascii=False)
 
 
 def find_card_index(cards: List[UserCard], name: str, card_type: int, rarity: int) -> int:

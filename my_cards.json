@@ -21,7 +21,7 @@
     "name": "Eishin Flash",
     "type": 0,
     "rarity": 2,
-    "lb": 2
+    "lb": 4
   },
   {
     "name": "Gold City",
@@ -33,7 +33,7 @@
     "name": "Shinko Windy",
     "type": 0,
     "rarity": 2,
-    "lb": 1
+    "lb": 3
   },
   {
     "name": "Sweep Tosho",
@@ -63,13 +63,13 @@
     "name": "Twin Turbo",
     "type": 0,
     "rarity": 3,
-    "lb": 1
+    "lb": 2
   },
   {
     "name": "Kitasan Black",
     "type": 0,
     "rarity": 3,
-    "lb": 0
+    "lb": 4
   },
   {
     "name": "Silence Suzuka",
@@ -93,7 +93,7 @@
     "name": "Tamamo Cross",
     "type": 1,
     "rarity": 3,
-    "lb": 0
+    "lb": 1
   },
   {
     "name": "Mayano Top Gun",
@@ -117,19 +117,25 @@
     "name": "Super Creek",
     "type": 1,
     "rarity": 3,
-    "lb": 3
+    "lb": 4
   },
   {
     "name": "Zenno Rob Roy",
     "type": 1,
     "rarity": 2,
-    "lb": 1
+    "lb": 4
   },
   {
     "name": "Tosen Jordan",
     "type": 1,
     "rarity": 2,
-    "lb": 1
+    "lb": 4
+  },
+  {
+    "name": "Nakayama Festa",
+    "type": 1,
+    "rarity": 3,
+    "lb": 0
   },
   {
     "name": "Satono Diamond",
@@ -162,10 +168,22 @@
     "lb": 4
   },
   {
+    "name": "El Condor Pasa",
+    "type": 2,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
     "name": "Agnes Digital",
     "type": 2,
     "rarity": 2,
     "lb": 4
+  },
+  {
+    "name": "Fine Motion",
+    "type": 2,
+    "rarity": 2,
+    "lb": 0
   },
   {
     "name": "Biwa Hayahide",
@@ -198,16 +216,22 @@
     "lb": 2
   },
   {
+    "name": "Smart Falcon",
+    "type": 2,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
     "name": "Nishino Flower",
     "type": 2,
     "rarity": 2,
-    "lb": 0
+    "lb":2
   },
   {
     "name": "Daitaku Helios",
     "type": 2,
     "rarity": 2,
-    "lb": 3
+    "lb": 4
   },
   {
     "name": "Yaeno Muteki",
@@ -226,6 +250,12 @@
     "type": 3,
     "rarity": 2,
     "lb": 4
+  },
+  {
+    "name": "Mejiro Ryan",
+    "type": 3,
+    "rarity": 3,
+    "lb": 0
   },
   {
     "name": "Yukino Bijin",
@@ -249,7 +279,7 @@
     "name": "Seeking the Pearl",
     "type": 3,
     "rarity": 2,
-    "lb": 1
+    "lb": 3
   },
   {
     "name": "Haru Urara",
@@ -282,6 +312,18 @@
     "lb": 0
   },
   {
+    "name": "Mejiro Palmer",
+    "type": 3,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Sirius Symboli",
+    "type": 3,
+    "rarity": 2,
+    "lb": 3
+  },
+  {
     "name": "Fuji Kiseki",
     "type": 4,
     "rarity": 2,
@@ -297,7 +339,7 @@
     "name": "Fine Motion",
     "type": 4,
     "rarity": 3,
-    "lb": 1
+    "lb": 3
   },
   {
     "name": "Mihono Bourbon",
@@ -316,6 +358,12 @@
     "type": 4,
     "rarity": 2,
     "lb": 4
+  },
+  {
+    "name": "Air Shakur",
+    "type": 4,
+    "rarity": 3,
+    "lb": 0
   },
   {
     "name": "Marvelous Sunday",
@@ -357,13 +405,13 @@
     "name": "Mejiro Ardan",
     "type": 4,
     "rarity": 2,
-    "lb": 1
+    "lb": 4
   },
   {
     "name": "Tazuna Hayakawa",
     "type": 5,
     "rarity": 3,
-    "lb": 0
+    "lb": 1
   },
   {
     "name": "Aio Kiryuin",

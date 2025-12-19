@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 
 """Enrich `my_cards.json` with data from `precomputed-tierlist.json`.
 
@@ -21,7 +21,18 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, TypedDict, cast
+from typing import Any, Dict, Iterable, List, Mapping, cast
+
+from util import (
+	EnrichedCard,
+	EnrichedData,
+	TierlistCard,
+	TierlistData,
+	UserCard,
+	get_file_hash,
+	load_json,
+	save_json,
+)
 
 
 @dataclass(frozen=True)
@@ -34,49 +45,6 @@ class CardKey:
 	name: str
 	type: int
 	rarity: int
-
-
-class TierlistCard(TypedDict, total=False):
-	"""Structure of a single card entry in the tierlist JSON."""
-
-	id: int
-	name: str
-	type: int
-	rarity: int
-	scores: List[int]
-	tiers: List[str]
-
-
-class TierlistData(TypedDict, total=False):
-	"""Top-level structure of the precomputed tierlist JSON (partial)."""
-
-	cards: Dict[str, TierlistCard]
-
-
-class UserCard(TypedDict, total=False):
-	"""Structure of a card in my_cards.json (partial).
-
-	We only model the fields we actually care about.
-	"""
-
-	name: str
-	type: int
-	rarity: int
-	lb: int
-
-
-def load_json(path: Path) -> object:
-	"""Load JSON from a file, raising a clear error if it fails."""
-
-	try:
-		with path.open("r", encoding="utf-8") as f:
-			return json.load(f)
-	except FileNotFoundError:
-		print(f"error: file not found: {path}", file=sys.stderr)
-		raise
-	except json.JSONDecodeError as e:
-		print(f"error: failed to parse JSON from {path}: {e}", file=sys.stderr)
-		raise
 
 
 def build_tierlist_index(tierlist: TierlistData) -> Dict[CardKey, TierlistCard]:
@@ -241,6 +209,13 @@ def add_subparser(subparsers: Any) -> None:
 	)
 
 	parser.add_argument(
+		"--force",
+		"-f",
+		action="store_true",
+		help="Force re-enrichment even if input files haven't changed.",
+	)
+
+	parser.add_argument(
 		"--pretty",
 		action="store_true",
 		help="Pretty-print JSON output with indentation.",
@@ -251,6 +226,25 @@ def add_subparser(subparsers: Any) -> None:
 
 def run(args: argparse.Namespace) -> int:
 	"""Execute the enrich subcommand."""
+	# Calculate hashes of input files to see if we need to re-enrich.
+	current_input_hash = get_file_hash(args.input)
+	current_tierlist_hash = get_file_hash(args.tierlist)
+
+	if not args.force and args.output.exists():
+		try:
+			existing_data = cast(Dict[str, Any], load_json(args.output))
+			if "metadata" in existing_data:
+				metadata = cast(Dict[str, str], existing_data.get("metadata", {}))
+				if (
+					metadata.get("input_hash") == current_input_hash
+					and metadata.get("tierlist_hash") == current_tierlist_hash
+				):
+					print("Enriched data is already up to date. Use --force to re-enrich.")
+					return 0
+		except Exception:
+			# If anything goes wrong reading the existing file, just proceed with enrichment.
+			pass
+
 	# Load input data.
 	cards_data_obj = load_json(args.input)
 	if not isinstance(cards_data_obj, list):
@@ -266,27 +260,33 @@ def run(args: argparse.Namespace) -> int:
 	tierlist_data = cast(TierlistData, tierlist_data_obj)
 	tier_index = build_tierlist_index(tierlist_data)
 
-	enriched = enrich_cards(cards_data, tier_index)
+	enriched_cards = enrich_cards(cards_data, tier_index)
+
+	# Prepare the output structure with metadata.
+	output_data: EnrichedData = {
+		"metadata": {
+			"input_hash": current_input_hash,
+			"tierlist_hash": current_tierlist_hash,
+		},
+		"cards": cast(List[EnrichedCard], enriched_cards),
+	}
 
 	# Write to file (never overwrite the original input unless the user explicitly
 	# passes the same path for --output, which is on them).
 	try:
-		args.output.parent.mkdir(parents=True, exist_ok=True)
-		with args.output.open("w", encoding="utf-8") as f:
-			if args.pretty:
-				json.dump(enriched, f, ensure_ascii=False, indent=2)
-			else:
-				json.dump(enriched, f, ensure_ascii=False)
-	except OSError as e:
+		save_json(args.output, output_data, pretty=args.pretty)
+		if not args.stdout:
+			print(f"Successfully enriched cards and saved to {args.output}")
+	except Exception as e:
 		print(f"error: failed to write output file {args.output}: {e}", file=sys.stderr)
 		return 1
 
 	# Optionally print to stdout for *nix-style piping.
 	if args.stdout:
 		if args.pretty:
-			json.dump(enriched, sys.stdout, ensure_ascii=False, indent=2)
+			json.dump(output_data, sys.stdout, ensure_ascii=False, indent=2)
 		else:
-			json.dump(enriched, sys.stdout, ensure_ascii=False)
+			json.dump(output_data, sys.stdout, ensure_ascii=False)
 		# Ensure trailing newline for nicer terminals.
 		sys.stdout.write("\n")
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 
 """Recommend the best cards to use based on type distribution.
 
@@ -11,62 +11,30 @@ This module builds a deck recommendation by:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict, cast
+from typing import Any, Dict, List, cast
+
+from util import EnrichedCard, TYPE_NAMES, load_enriched_cards, load_json
+
+TIER_ORDER = ["S+", "S", "A+", "A", "B+", "B", "C+", "C", "D+", "D", "E+", "E", "F"]
+TIER_VALUE = {t: len(TIER_ORDER) - i for i, t in enumerate(TIER_ORDER)}
 
 
-class EnrichedCard(TypedDict, total=False):
-	"""Structure of a card in my_cards_enriched.json."""
-
-	name: str
-	type: int
-	rarity: int
-	lb: int
-	id: int
-	score: int
-	tier: str
+def get_tier_value(tier: str | None) -> int:
+	"""Convert a tier string (S+, S, etc.) to a numeric value for comparison."""
+	if not tier:
+		return 0
+	return TIER_VALUE.get(tier, 0)
 
 
-class TierlistCard(TypedDict, total=False):
-	"""Structure of a card in precomputed-tierlist.json."""
-
-	id: int
-	name: str
-	type: int
-	rarity: int
-	scores: List[int]
-	tiers: List[str]
-
-
-TYPE_NAMES = {
-	0: "Speed",
-	1: "Stamina",
-	2: "Power",
-	3: "Guts",
-	4: "Wit",
-	5: "Friend",
-}
-
-
-def load_json(path: Path) -> object:
-	"""Load JSON from a file."""
-	try:
-		with path.open("r", encoding="utf-8") as f:
-			return json.load(f)
-	except FileNotFoundError:
-		print(f"error: file not found: {path}", file=sys.stderr)
-		raise
-	except json.JSONDecodeError as e:
-		print(f"error: failed to parse JSON from {path}: {e}", file=sys.stderr)
-		raise
-
-
-def find_best_card_in_tierlist(tierlist_path: Path) -> tuple[int, str, int, int]:
-	"""Find the absolute best card in the entire tierlist.
+def get_best_cards_by_type_from_tierlist(
+	tierlist_path: Path, 
+	my_cards: List[EnrichedCard]
+) -> Dict[int, tuple[int, str, int, int, str]]:
+	"""Find the best card for each type in the tierlist that the user doesn't have at MLB.
 	
-	Returns: (card_id, card_name, card_type, max_score)
+	Returns: Mapping of type -> (card_id, card_name, card_type, max_score, max_tier)
 	"""
 	data = load_json(tierlist_path)
 	
@@ -77,39 +45,61 @@ def find_best_card_in_tierlist(tierlist_path: Path) -> tuple[int, str, int, int]
 	if not isinstance(cards_data, dict):
 		raise ValueError("Invalid tierlist cards format")
 	cards = cast(Dict[str, Any], cards_data)
-	best_score = 0
-	best_card = None
+	
+	# Create a set of IDs that the user already has at MLB (lb=4)
+	mlb_ids = {c.get("id") for c in my_cards if c.get("lb") == 4 and c.get("id") is not None}
+	
+	best_by_type: Dict[int, tuple[int, str, int, int, str]] = {}
 	
 	for card_id, card_info in cards.items():
 		if not isinstance(card_info, dict):
 			continue
 		
 		card_dict = cast(Dict[str, Any], card_info)
+		
+		# Get card ID
+		card_id_int = card_dict.get("id")
+		if not isinstance(card_id_int, int):
+			card_id_int = int(card_id) if card_id.isdigit() else 0
+		
+		# Skip if user already has this card at MLB
+		if card_id_int in mlb_ids:
+			continue
+			
 		scores_obj = card_dict.get("scores", [])
-		if not isinstance(scores_obj, list):
+		tiers_obj = card_dict.get("tiers", [])
+		if not isinstance(scores_obj, list) or not isinstance(tiers_obj, list):
 			continue
 		scores = cast(List[int], scores_obj)
-		if not scores:
+		tiers = cast(List[str], tiers_obj)
+		if not scores or not tiers:
 			continue
 		
 		max_score = max(scores)
-		if max_score > best_score:
-			best_score = max_score
-			card_id_int = card_dict.get("id")
-			if not isinstance(card_id_int, int):
-				card_id_int = int(card_id) if card_id.isdigit() else 0
+		max_tier = tiers[-1]  # Assuming last tier is for MLB
+		card_type = card_dict.get("type", -1)
+		if not isinstance(card_type, int) or card_type == -1:
+			continue
+			
+		# Compare by tier first, then score
+		current_best = best_by_type.get(card_type)
+		if not current_best or get_tier_value(max_tier) > get_tier_value(current_best[4]) or (get_tier_value(max_tier) == get_tier_value(current_best[4]) and max_score > current_best[3]):
 			card_name = card_dict.get("name", "Unknown")
 			if not isinstance(card_name, str):
 				card_name = "Unknown"
-			card_type = card_dict.get("type", -1)
-			if not isinstance(card_type, int):
-				card_type = -1
-			best_card = (card_id_int, card_name, card_type, max_score)
+			best_by_type[card_type] = (card_id_int, card_name, card_type, max_score, max_tier)
 	
-	if best_card is None:
+	return best_by_type
+
+
+def find_best_card_in_tierlist(tierlist_path: Path, my_cards: List[EnrichedCard]) -> tuple[int, str, int, int, str]:
+	"""Find the absolute best card in the entire tierlist that the user doesn't have at MLB."""
+	best_by_type = get_best_cards_by_type_from_tierlist(tierlist_path, my_cards)
+	if not best_by_type:
 		raise ValueError("No valid cards found in tierlist")
 	
-	return best_card
+	# Return the one with the highest tier, then score
+	return max(best_by_type.values(), key=lambda x: (get_tier_value(x[4]), x[3]))
 
 
 def select_best_cards_by_type(
@@ -318,49 +308,84 @@ def run(args: argparse.Namespace) -> int:
 		return 1
 	
 	# Load user's cards
-	my_cards_obj = load_json(args.input)
-	if not isinstance(my_cards_obj, list):
-		print(f"error: expected JSON array in {args.input}", file=sys.stderr)
-		return 1
-	
-	my_cards = cast(List[EnrichedCard], my_cards_obj)
+	my_cards = load_enriched_cards(args.input)
 	
 	# Find the best support card from tierlist if requested
 	support_card = None
 	exclude_id = None
+	selected: List[EnrichedCard] = []
 	
 	if not args.no_support and total_cards < 6:
 		try:
-			best_id, best_name, best_type, best_score = find_best_card_in_tierlist(args.tierlist)
-			support_card = (best_id, best_name, best_type, best_score)
-			exclude_id = best_id
-			print(f"Found best support card: {best_name} (Score: {best_score})\n")
+			# Try borrowing the best card of each type and see which one is best for the deck
+			potential_borrows = get_best_cards_by_type_from_tierlist(args.tierlist, my_cards)
+			
+			best_overall_tier_val = -1
+			best_overall_score = -1
+			best_support = None
+			best_selected_for_support: List[EnrichedCard] = []
+			
+			for borrow_candidate in potential_borrows.values():
+				cand_id, _, cand_type, cand_score, cand_tier = borrow_candidate
+				
+				# Adjust type counts for simulation: the borrow card fills one slot of its type
+				sim_type_counts = type_counts.copy()
+				if sim_type_counts.get(cand_type, 0) > 0:
+					sim_type_counts[cand_type] -= 1
+				
+				# Simulate deck with this borrow_candidate
+				current_selected = select_best_cards_by_type(my_cards, sim_type_counts, cand_id)
+				
+				# Fill remaining slots to reach 6 total (including borrow)
+				current_total = len(current_selected) + 1
+				if current_total < 6:
+					sel_ids = {c.get("id") for c in current_selected}
+					sel_ids.add(cand_id)
+					rem = [c for c in my_cards if c.get("id") not in sel_ids and c.get("score") is not None]
+					rem.sort(key=lambda c: c.get("score", 0), reverse=True)
+					current_selected.extend(rem[:6 - current_total])
+				
+				# Calculate total score and average tier
+				total_score = cand_score + sum(c.get("score", 0) for c in current_selected)
+				total_tier_val = get_tier_value(cand_tier) + sum(get_tier_value(cast(str, c.get("tier"))) for c in current_selected)
+				
+				# Compare by total tier value first, then total score
+				if total_tier_val > best_overall_tier_val or (total_tier_val == best_overall_tier_val and total_score > best_overall_score):
+					best_overall_tier_val = total_tier_val
+					best_overall_score = total_score
+					best_support = borrow_candidate
+					best_selected_for_support = current_selected
+			
+			if best_support:
+				support_card = (best_support[0], best_support[1], best_support[2], best_support[3])
+				exclude_id = best_support[0]
+				selected = best_selected_for_support
+				print(f"Found best support card to borrow: {best_support[1]} ({TYPE_NAMES.get(best_support[2])}) (Tier: {best_support[4]}, Score: {best_support[3]})\n")
 		except Exception as e:
 			print(f"warning: could not find support card: {e}", file=sys.stderr)
 	
-	# Select best cards from user's collection for specified types
-	selected = select_best_cards_by_type(my_cards, type_counts, exclude_id)
-	
-	# If we have fewer than 6 cards total (including support), fill with best remaining
-	current_total = len(selected) + (1 if support_card else 0)
-	if current_total < 6:
-		# Get all cards not already selected
-		selected_ids = {card.get("id") for card in selected}
-		if exclude_id is not None:
-			selected_ids.add(exclude_id)
+	# If no support card was found or requested, select cards normally
+	if not support_card:
+		selected = select_best_cards_by_type(my_cards, type_counts, exclude_id)
 		
-		remaining_cards = [
-			card for card in my_cards
-			if card.get("id") not in selected_ids and card.get("score") is not None
-		]
-		remaining_cards.sort(key=lambda c: c.get("score", 0), reverse=True)
-		
-		# Add best remaining cards to reach 6 total
-		num_to_add = 6 - current_total
-		selected.extend(remaining_cards[:num_to_add])
-		
-		if num_to_add > 0 and remaining_cards:
-			print(f"Filled {min(num_to_add, len(remaining_cards))} remaining slot(s) with best available cards\n")
+		# If we have fewer than 6 cards total, fill with best remaining
+		current_total = len(selected)
+		if current_total < 6:
+			# Get all cards not already selected
+			selected_ids = {card.get("id") for card in selected}
+			
+			remaining_cards = [
+				card for card in my_cards
+				if card.get("id") not in selected_ids and card.get("score") is not None
+			]
+			remaining_cards.sort(key=lambda c: c.get("score", 0), reverse=True)
+			
+			# Add best remaining cards to reach 6 total
+			num_to_add = 6 - current_total
+			selected.extend(remaining_cards[:num_to_add])
+			
+			if num_to_add > 0 and remaining_cards:
+				print(f"Filled {min(num_to_add, len(remaining_cards))} remaining slot(s) with best available cards\n")
 	
 	# Check if we got enough cards
 	if len(selected) + (1 if support_card else 0) < 6:
@@ -377,7 +402,7 @@ def run(args: argparse.Namespace) -> int:
 	print()
 	
 	if support_card:
-		best_id, best_name, best_type, best_score = support_card
+		_, best_name, best_type, best_score = support_card
 		print(format_card_display(
 			best_name,
 			best_type,
@@ -418,12 +443,7 @@ def run(args: argparse.Namespace) -> int:
 def run_best_cards(args: argparse.Namespace) -> int:
 	"""Show the best 6 cards available regardless of type."""
 	# Load user's cards
-	my_cards_obj = load_json(args.input)
-	if not isinstance(my_cards_obj, list):
-		print(f"error: expected JSON array in {args.input}", file=sys.stderr)
-		return 1
-	
-	my_cards = cast(List[EnrichedCard], my_cards_obj)
+	my_cards = load_enriched_cards(args.input)
 	
 	# Find the best support card from tierlist if requested
 	support_card = None
@@ -431,10 +451,10 @@ def run_best_cards(args: argparse.Namespace) -> int:
 	
 	if not args.no_support:
 		try:
-			best_id, best_name, best_type, best_score = find_best_card_in_tierlist(args.tierlist)
+			best_id, best_name, best_type, best_score, best_tier = find_best_card_in_tierlist(args.tierlist, my_cards)
 			support_card = (best_id, best_name, best_type, best_score)
 			exclude_id = best_id
-			print(f"Found best support card: {best_name} (Score: {best_score})\n")
+			print(f"Found best support card to borrow: {best_name} ({TYPE_NAMES.get(best_type)}) (Tier: {best_tier}, Score: {best_score})\n")
 		except Exception as e:
 			print(f"warning: could not find support card: {e}", file=sys.stderr)
 	
@@ -456,7 +476,7 @@ def run_best_cards(args: argparse.Namespace) -> int:
 	print()
 	
 	if support_card:
-		best_id, best_name, best_type, best_score = support_card
+		_, best_name, best_type, best_score = support_card
 		print(format_card_display(
 			best_name,
 			best_type,
@@ -492,23 +512,3 @@ def run_best_cards(args: argparse.Namespace) -> int:
 	print("=" * 70)
 	
 	return 0
-
-
-if __name__ == "__main__":
-	# For standalone execution
-	class Args:
-		pass
-	
-	default_base = Path(__file__).resolve().parent.parent
-	args = Args()
-	args.speed = 1  # type: ignore[attr-defined]
-	args.stamina = 1  # type: ignore[attr-defined]
-	args.power = 1  # type: ignore[attr-defined]
-	args.guts = 1  # type: ignore[attr-defined]
-	args.wit = 1  # type: ignore[attr-defined]
-	args.friend = 0  # type: ignore[attr-defined]
-	args.input = default_base / "my_cards_enriched.json"  # type: ignore[attr-defined]
-	args.tierlist = default_base / "precomputed-tierlist.json"  # type: ignore[attr-defined]
-	args.no_support = False  # type: ignore[attr-defined]
-	
-	raise SystemExit(run(args))  # type: ignore[arg-type]

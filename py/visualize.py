@@ -1,58 +1,15 @@
-#!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 
 """Generate a Markdown visualization of enriched cards grouped by type and sorted by score."""
 
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import Any, List, TypedDict, cast
+from typing import Any, List
 
-
-class EnrichedCard(TypedDict, total=False):
-    """Structure of a card in my_cards_enriched.json."""
-
-    name: str
-    type: int
-    rarity: int
-    lb: int
-    id: int
-    score: int
-    tier: str
-
-
-TYPE_NAMES = {
-    0: "Speed",
-    1: "Stamina",
-    2: "Power",
-    3: "Guts",
-    4: "Wit",
-    5: "Friend",
-}
-
-
-def load_enriched_cards(path: Path) -> List[EnrichedCard]:
-    """Load and validate the enriched cards JSON."""
-    try:
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        print(f"error: file not found: {path}", file=sys.stderr)
-        raise
-    except json.JSONDecodeError as e:
-        print(f"error: failed to parse JSON from {path}: {e}", file=sys.stderr)
-        raise
-
-    if not isinstance(data, list):
-        print(
-            f"error: expected a JSON array in {path}, got {type(data).__name__}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    return cast(List[EnrichedCard], data)
+from util import EnrichedCard, TYPE_NAMES, load_enriched_cards
 
 
 def generate_markdown(cards: List[EnrichedCard]) -> str:
@@ -195,40 +152,3 @@ def run(args: argparse.Namespace) -> int:
         print(markdown)
 
     return 0
-
-
-if __name__ == "__main__":
-    # For standalone execution, create a minimal parser
-    class Args:
-        pass
-
-    default_base = Path(__file__).resolve().parent.parent
-    args = Args()
-
-    # Parse simple arguments
-    if "--stdout" in sys.argv:
-        args.stdout = True  # type: ignore[attr-defined]
-    else:
-        args.stdout = False  # type: ignore[attr-defined]
-
-    # Look for --input
-    if "--input" in sys.argv or "-i" in sys.argv:
-        idx = (
-            sys.argv.index("--input") if "--input" in sys.argv else sys.argv.index("-i")
-        )
-        args.input = Path(sys.argv[idx + 1])  # type: ignore[attr-defined]
-    else:
-        args.input = default_base / "my_cards_enriched.json"  # type: ignore[attr-defined]
-
-    # Look for --output
-    if "--output" in sys.argv or "-o" in sys.argv:
-        idx = (
-            sys.argv.index("--output")
-            if "--output" in sys.argv
-            else sys.argv.index("-o")
-        )
-        args.output = Path(sys.argv[idx + 1])  # type: ignore[attr-defined]
-    else:
-        args.output = default_base / "my_cards_visualization.md"  # type: ignore[attr-defined]
-
-    raise SystemExit(run(args))  # type: ignore[arg-type]
