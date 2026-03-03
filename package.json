@@ -1,0 +1,17 @@
+{
+  "name": "uma-card-manager",
+  "private": true,
+  "workspaces": [
+    "server",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w server && npm run build -w frontend",
+    "start": "node server/dist/index.js",
+    "format": "npm run format -w server && npm run format -w frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
