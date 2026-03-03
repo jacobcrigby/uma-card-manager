@@ -72,13 +72,8 @@ def build_tierlist_index(tierlist: TierlistData) -> Dict[CardKey, TierlistCard]:
         key = CardKey(name=name, type=ctype, rarity=rarity)
 
         if key in index:
-            # Multiple entries for the same (name, type, rarity). This *shouldn't* happen,
-            # but if it does, warn and keep the first one.
-            print(
-                "warning: duplicate tierlist entry for "
-                f"(name={name!r}, type={ctype}, rarity={rarity}); ignoring later one",
-                file=sys.stderr,
-            )
+            # Multiple entries for the same (name, type, rarity).
+            # Silently skip duplicates and keep the first one.
             continue
 
         index[key] = card
@@ -120,12 +115,17 @@ def enrich_cards(
         tier_card = tier_index.get(key)
 
         if tier_card is None:
-            # No tierlist entry found for this card; log and skip it entirely.
+            # No tierlist entry found for this card (e.g., Friend cards).
+            # Include it anyway without score/tier so it's available for deck building.
+            # Assign a synthetic ID based on hash of (name, type, rarity)
+            synthetic_id = 40000 + (hash((name, ctype, rarity)) % 10000)
+            out["id"] = synthetic_id
             print(
-                "warning: no tierlist match for card "
-                f"(name={name!r}, type={ctype}, rarity={rarity}); skipping",
+                f"info: no tierlist match for card "
+                f"(name={name!r}, type={ctype}, rarity={rarity}); including without score/tier (ID: {synthetic_id})",
                 file=sys.stderr,
             )
+            enriched.append(out)
             continue
 
         # Add ID from tierlist if present.

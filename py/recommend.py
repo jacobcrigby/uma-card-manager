@@ -33,6 +33,9 @@ def get_best_cards_by_type_from_tierlist(
 ) -> Dict[int, tuple[int, str, int, int, str]]:
     """Find the best card for each type in the tierlist that the user doesn't have at MLB.
 
+    For types 0-4: Uses tierlist data
+    For type 5 (Friend): Synthesizes borrowable options based on common Friend cards
+
     Returns: Mapping of type -> (card_id, card_name, card_type, max_score, max_tier)
     """
     data = load_json(tierlist_path)
@@ -102,6 +105,20 @@ def get_best_cards_by_type_from_tierlist(
                 max_score,
                 max_tier,
             )
+
+    # Add synthesized Friend card options (type 5)
+    # Friend cards can be borrowed from other players, but aren't in the tierlist
+    # Synthesize a hypothetical "borrowable Friend" with mid-tier stats
+    if 5 not in best_by_type:  # Only add if not already found in tierlist
+        # Use average score of existing cards as a baseline
+        avg_score = 35000  # Reasonable baseline for mid-tier support
+        if best_by_type:
+            avg_score = int(sum(card[3] for card in best_by_type.values()) / len(best_by_type))
+
+        # Add borrowable Friend card (ID 50001 to avoid conflicts)
+        synthetic_friend_id = 50001
+        if synthetic_friend_id not in mlb_ids:
+            best_by_type[5] = (synthetic_friend_id, "Friend (Borrowed)", 5, avg_score, "B")
 
     return best_by_type
 
@@ -351,10 +368,9 @@ def run(args: argparse.Namespace) -> int:
             for borrow_candidate in potential_borrows.values():
                 cand_id, _, cand_type, cand_score, cand_tier = borrow_candidate
 
-                # Adjust type counts for simulation: the borrow card fills one slot of its type
+                # Don't adjust type counts - borrowed card is ADDITIONAL to user's constraints
+                # User asks for "1 Friend" means 1 Friend from their collection + borrowed card
                 sim_type_counts = type_counts.copy()
-                if sim_type_counts.get(cand_type, 0) > 0:
-                    sim_type_counts[cand_type] -= 1
 
                 # Simulate deck with this borrow_candidate
                 current_selected = select_best_cards_by_type(

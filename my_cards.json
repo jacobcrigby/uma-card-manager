@@ -33,13 +33,19 @@
     "name": "Shinko Windy",
     "type": 0,
     "rarity": 2,
-    "lb": 3
+    "lb": 4
   },
   {
     "name": "Sweep Tosho",
     "type": 0,
     "rarity": 2,
     "lb": 4
+  },
+  {
+    "name": "Tosen Jordan",
+    "type": 0,
+    "rarity": 3,
+    "lb": 0
   },
   {
     "name": "Narita Taishin",
@@ -49,6 +55,12 @@
   },
   {
     "name": "Nishino Flower",
+    "type": 0,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Biko Pegasus",
     "type": 0,
     "rarity": 3,
     "lb": 0
@@ -141,7 +153,7 @@
     "name": "Satono Diamond",
     "type": 1,
     "rarity": 3,
-    "lb": 1
+    "lb": 2
   },
   {
     "name": "Sakura Chiyono O",
@@ -183,7 +195,7 @@
     "name": "Fine Motion",
     "type": 2,
     "rarity": 2,
-    "lb": 0
+    "lb": 1
   },
   {
     "name": "Biwa Hayahide",
@@ -210,6 +222,12 @@
     "lb": 0
   },
   {
+    "name": "Inari One",
+    "type": 2,
+    "rarity": 2,
+    "lb": 0
+  },
+  {
     "name": "Winning Ticket",
     "type": 2,
     "rarity": 3,
@@ -228,10 +246,22 @@
     "lb":2
   },
   {
+    "name": "Marvelous Sunday",
+    "type": 2,
+    "rarity": 3,
+    "lb": 1
+  },
+  {
     "name": "Daitaku Helios",
     "type": 2,
     "rarity": 2,
     "lb": 4
+  },
+  {
+    "name": "Daitaku Helios",
+    "type": 2,
+    "rarity": 3,
+    "lb": 0
   },
   {
     "name": "Yaeno Muteki",
@@ -258,10 +288,22 @@
     "lb": 0
   },
   {
+    "name": "Hishi Akebono",
+    "type": 3,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
     "name": "Yukino Bijin",
     "type": 3,
     "rarity": 2,
     "lb": 4
+  },
+  {
+    "name": "Yukino Bijin",
+    "type": 3,
+    "rarity": 3,
+    "lb": 0
   },
   {
     "name": "Ines Fujin",
@@ -361,6 +403,12 @@
   },
   {
     "name": "Air Shakur",
+    "type": 4,
+    "rarity": 3,
+    "lb": 0
+  },
+  {
+    "name": "Narita Taishin",
     "type": 4,
     "rarity": 3,
     "lb": 0

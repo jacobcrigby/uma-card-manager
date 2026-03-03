@@ -1,114 +1,89 @@
-# Uma Musume Card Management Tool
+# Uma Musume Card Manager
 
-A vibe coded Python-based CLI tool for managing and analyzing your Uma Musume support card collection. This tool helps you enrich your local card data with tierlist information, visualize your collection in Markdown, and get deck recommendations.
+A vibe coded tool for managing your Uma Musume support card collection. Enriches your cards with tierlist scores, visualizes your collection, and recommends decks — available as both a web app and a CLI.
 
 ## Features
 
-- **Enrichment**: Automatically match your cards against a comprehensive tierlist to add scores and tiers.
-- **Visualization**: Generate a clean Markdown report of your collection, grouped by type and sorted by score.
-- **Recommendations**: Get suggestions for the best cards to use in your decks, including support for specific card types.
-- **Collection Management**: Easily add new cards or update limit break (LB) levels via the CLI.
-- **Data Updates**: Pull the latest precomputed tierlist data directly from the web.
+- **Collection view**: Browse your cards enriched with tierlist scores and tiers, grouped by type
+- **Deck recommendations**: Get suggestions for the best 6-card deck, with options for type distribution and borrowing
+- **Collection management**: Add new cards or update limit break (LB) levels via the web UI or CLI
+- **Auto-refresh**: The web app polls for file changes so the UI stays in sync when you use the CLI
+- **Data updates**: Pull the latest precomputed tierlist from uma.moe
+
+## Web App (recommended)
+
+Start the backend and frontend separately:
+
+```bash
+# Backend (from repo root)
+uv run uvicorn py.api.main:app --reload --port 8000
+
+# Frontend (from frontend/)
+npm install
+npm run dev   # Dev server on localhost:5173
+```
+
+Or build the frontend for production — FastAPI will serve it automatically:
+
+```bash
+cd frontend && npm run build
+# Then just run the backend; visit http://localhost:8000
+uv run uvicorn py.api.main:app --port 8000
+```
+
+API docs are available at `http://localhost:8000/api/docs`.
+
+## CLI
+
+```bash
+uv run py/main.py --help
+
+uv run py/main.py update                        # Fetch latest tierlist from uma.moe
+uv run py/main.py add "Kitasan Black" spd SSR   # Add card (types: spd/sta/pow/gut/wit/fri, rarities: R/SR/SSR)
+uv run py/main.py enrich                        # Enrich cards (skipped if inputs unchanged)
+uv run py/main.py enrich --force                # Force re-enrichment
+uv run py/main.py visualize                     # Generate my_cards.md
+uv run py/main.py recommend                     # Get 6-card deck recommendation
+```
 
 ## Project Structure
 
-- `my_cards.json`: Your local card collection.
-- `precomputed-tierlist.json`: The reference tierlist data.
-- `py/`: Python source code.
-  - `main.py`: CLI entry point.
-  - `util.py`: Shared types and utility functions.
-  - `enrich.py`: Logic for data enrichment.
-  - `visualize.py`: Markdown report generation.
-  - `recommend.py`: Deck recommendation engine.
-  - `add.py`: Collection management logic.
-  - `fetch.py`: Data update logic.
+```text
+my_cards.json               # Your card collection
+precomputed-tierlist.json   # Reference tierlist from uma.moe
+my_cards_enriched.json      # Generated — cards with scores and tiers
+py/
+  main.py                   # CLI entry point
+  enrich.py                 # Fuzzy-match cards against tierlist
+  recommend.py              # Greedy deck selection engine
+  visualize.py              # Markdown report generation
+  add.py / fetch.py         # Collection management and data updates
+  util.py                   # Shared types and JSON helpers
+  api/                      # FastAPI backend
+    routes/                 # cards, enrichment, metadata, recommendations
+    services/               # Business logic shared with CLI
+frontend/
+  src/
+    components/             # Lit web components
+    services/api.ts         # API client
+    services/types.ts       # TypeScript interfaces
+```
 
 ## Installation
 
-This project uses `uv` for dependency management.
+Requires [uv](https://github.com/astral-sh/uv) for Python and Node.js for the frontend.
 
 ```bash
-# Clone the repository (if applicable)
-# cd into the project directory
-
-# Run the tool using uv
+# Python dependencies are managed automatically by uv
 uv run py/main.py --help
+
+# Frontend dependencies
+cd frontend && npm install
 ```
-
-## Usage
-
-The tool is organized into several subcommands:
-
-### 1. Update Tierlist Data
-
-Fetch the latest tierlist data from the internet:
-
-```bash
-uv run py/main.py update
-```
-
-### 2. Add or Update Cards
-
-Add a new card or increase the LB level of an existing one:
-
-```bash
-# Usage: add <name> <type> <rarity>
-uv run py/main.py add "Kitasan Black" spd SSR
-```
-
-*Types: spd, sta, pow, gut, wit, fri*
-*Rarities: R, SR, SSR*
-
-### 3. Enrich Your Collection
-
-Match your cards with the tierlist data to calculate scores. This process is automatically skipped if your input files haven't changed since the last enrichment.
-
-```bash
-uv run py/main.py enrich
-```
-
-Use `--force` or `-f` to force re-enrichment:
-
-```bash
-uv run py/main.py enrich --force
-```
-
-### 4. Visualize Collection
-
-Generate a Markdown report (`my_cards.md`):
-
-```bash
-uv run py/main.py visualize
-```
-
-### 5. Get Recommendations
-
-Get recommendations for a 6-card deck:
-
-```bash
-uv run py/main.py recommend
-```
-
-## Data Formats
-
-### my_cards.json
-
-```json
-[
-  {
-    "name": "Kitasan Black",
-    "type": 0,
-    "rarity": 3,
-    "lb": 4
-  }
-]
-```
-
-The included `my_cards.json` works as an example.
 
 ## Credits
 
-The precomputed tierlist data used by this tool is sourced from [uma.moe](https://uma.moe).
+Precomputed tierlist data sourced from [uma.moe/tierlist](https://uma.moe/tierlist).
 
 ## License
 
