@@ -2,16 +2,27 @@
 my_cards_enriched.json
 my_cards_visualization.md
 
-# VSCode local settings
-.vscode
+# Node.js
+node_modules/
+package-lock.json
 
-# Python-generated files
+# Build output
+dist/
+frontend/dist/
+server/dist/
+
+# VSCode local settings
+.vscode/
+
+# Python
 __pycache__/
 *.py[oc]
 build/
-dist/
 wheels/
 *.egg-info
 
 # Virtual environments
 .venv
+
+# Claude Code
+.claude/
