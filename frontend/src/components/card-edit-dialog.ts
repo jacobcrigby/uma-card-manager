@@ -106,70 +106,37 @@ export class CardEditDialog extends LitElement {
 
     .lb-selector {
       display: flex;
-      gap: 1rem;
-      justify-content: center;
       align-items: center;
+      gap: 8px;
     }
 
-    .lb-option {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      padding: 0.75rem;
-      border-radius: 8px;
-      transition: background 0.2s;
-      min-width: 60px;
-    }
-
-    .lb-option:hover {
-      background: #f5f5f5;
-    }
-
-    .lb-option.selected {
-      background: #e3f2fd;
-      box-shadow: 0 0 0 2px #2196f3;
-    }
-
-    .crystal-display {
-      display: flex;
-      gap: 4px;
-    }
-
-    .crystal {
-      width: 20px;
-      height: 20px;
+    .diamond {
+      width: 22px;
+      height: 22px;
       transform: rotate(45deg);
       border: 2px solid #ccc;
       border-radius: 3px;
-      transition: all 0.2s;
-      overflow: hidden;
-    }
-
-    .crystal-inner {
-      width: 100%;
-      height: 100%;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
       background: transparent;
-      transition: background 0.2s;
     }
 
-    .crystal.filled .crystal-inner {
+    .diamond.filled {
       background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      border-color: #1976d2;
     }
 
-    .lb-option:hover .crystal .crystal-inner {
-      opacity: 0.8;
+    .diamond.preview {
+      background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+      border-color: #64b5f6;
     }
 
-    .lb-label {
-      font-size: 0.85rem;
+    .lb-current-label {
+      font-size: 0.9rem;
       font-weight: 600;
-      color: #666;
-    }
-
-    .lb-option.selected .lb-label {
-      color: #2196f3;
+      color: #555;
+      margin-left: 4px;
+      min-width: 2.5rem;
     }
 
     .dialog-actions {
@@ -231,6 +198,7 @@ export class CardEditDialog extends LitElement {
   @property({ type: Object }) card!: EnrichedCard;
   @property({ type: Number }) cardIndex!: number;
   @state() private selectedLB: number = 0;
+  @state() private hoverLB: number = -1;
   @state() private saving = false;
   @state() private error: string | null = null;
 
@@ -264,20 +232,6 @@ export class CardEditDialog extends LitElement {
     } finally {
       this.saving = false;
     }
-  }
-
-  private renderCrystals(lb: number) {
-    return html`
-      <div class="crystal-display">
-        ${[0, 1, 2, 3].map(
-          (i) => html`
-            <div class="crystal ${i < lb ? 'filled' : ''}">
-              <div class="crystal-inner"></div>
-            </div>
-          `
-        )}
-      </div>
-    `;
   }
 
   render() {
@@ -322,19 +276,21 @@ export class CardEditDialog extends LitElement {
         </div>
 
         <div class="lb-section">
-          <h3>Select Limit Break Level</h3>
+          <h3>Limit Break</h3>
           <div class="lb-selector">
-            ${[0, 1, 2, 3, 4].map(
-              (lb) => html`
+            ${[1, 2, 3, 4].map((n) => {
+              const active = this.hoverLB >= 0 ? n <= this.hoverLB : n <= this.selectedLB;
+              const isPreview = this.hoverLB >= 0 && n <= this.hoverLB && n > this.selectedLB;
+              return html`
                 <div
-                  class="lb-option ${this.selectedLB === lb ? 'selected' : ''}"
-                  @click=${() => (this.selectedLB = lb)}
-                >
-                  ${this.renderCrystals(lb)}
-                  <span class="lb-label">${lb === 4 ? 'MLB' : `LB${lb}`}</span>
-                </div>
-              `
-            )}
+                  class="diamond ${active && !isPreview ? 'filled' : ''} ${isPreview ? 'preview' : ''}"
+                  @click=${() => (this.selectedLB = this.selectedLB === n ? 0 : n)}
+                  @mouseenter=${() => (this.hoverLB = n)}
+                  @mouseleave=${() => (this.hoverLB = -1)}
+                ></div>
+              `;
+            })}
+            <span class="lb-current-label">${this.selectedLB === 4 ? 'MLB' : `LB${this.selectedLB}`}</span>
           </div>
         </div>
 
