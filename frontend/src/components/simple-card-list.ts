@@ -1,8 +1,10 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import type { CardResponse } from '../services/types';
+import { customElement, property, state } from 'lit/decorators.js';
+import type { CardResponse, EnrichedCard } from '../services/types';
 import { formatType, formatRarity } from '../utils/formatters';
 import './lb-crystals';
+
+type SortOrder = 'my-list' | 'tierlist-order';
 
 @customElement('simple-card-list')
 export class SimpleCardList extends LitElement {
@@ -109,9 +111,60 @@ export class SimpleCardList extends LitElement {
       color: #999;
       font-size: 0.85rem;
     }
+
+    .sort-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+
+    .sort-label {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .sort-btn {
+      padding: 0.25rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: white;
+      color: #555;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sort-btn:hover {
+      border-color: #2196f3;
+      color: #1976d2;
+    }
+
+    .sort-btn.active {
+      background: #2196f3;
+      border-color: #2196f3;
+      color: white;
+    }
   `;
 
   @property({ type: Array }) cards: CardResponse[] = [];
+  @property({ type: Array }) enrichedCards: EnrichedCard[] = [];
+  @state() private sortOrder: SortOrder = 'my-list';
+
+  private get sortedCards(): CardResponse[] {
+    if (this.sortOrder === 'my-list') return this.cards;
+
+    const idMap = new Map<string, number>();
+    for (const ec of this.enrichedCards) {
+      idMap.set(`${ec.name}|${ec.type}|${ec.rarity}`, ec.id);
+    }
+
+    return [...this.cards].sort((a, b) => {
+      const aId = idMap.get(`${a.name}|${a.type}|${a.rarity}`) ?? Infinity;
+      const bId = idMap.get(`${b.name}|${b.type}|${b.rarity}`) ?? Infinity;
+      return aId - bId;
+    });
+  }
 
   render() {
     if (this.cards.length === 0) {
@@ -123,10 +176,23 @@ export class SimpleCardList extends LitElement {
       `;
     }
 
+    const sorted = this.sortedCards;
+
     return html`
       <div class="list-header">
         <h3>My Cards</h3>
         <span class="count-badge">${this.cards.length} total</span>
+        <div class="sort-controls">
+          <span class="sort-label">Sort:</span>
+          <button
+            class="sort-btn ${this.sortOrder === 'my-list' ? 'active' : ''}"
+            @click=${() => (this.sortOrder = 'my-list')}
+          >My List</button>
+          <button
+            class="sort-btn ${this.sortOrder === 'tierlist-order' ? 'active' : ''}"
+            @click=${() => (this.sortOrder = 'tierlist-order')}
+          >Tierlist Order</button>
+        </div>
       </div>
 
       <div class="card-table">
@@ -141,7 +207,7 @@ export class SimpleCardList extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${this.cards.map(
+            ${sorted.map(
               (card, index) => html`
                 <tr>
                   <td class="row-number">${index + 1}</td>

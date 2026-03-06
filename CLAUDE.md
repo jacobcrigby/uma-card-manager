@@ -100,3 +100,7 @@ Card types are integers 0–5: Speed=0, Stamina=1, Power=2, Guts=3, Wit=4, Frien
 Rarities are integers 1–3: R=1, SR=2, SSR=3.
 LB levels are 0–4 (4 = max limit break).
 Tier strings: S+, S, A, B, C, D, E, F. Score and tier may be `None` for Friend cards not in the tierlist.
+
+### Recommendation constraints
+
+The game **always requires exactly 1 borrowed (support) card** per 6-card deck. The recommendation system must always include 1 borrowed card from the tierlist (unless `no_support=True`). When the user specifies type counts summing to 6, the borrowed card fills one of those requested type slots (5 from collection + 1 borrowed = 6 total). The borrowed card's type must match one of the requested types in this case.

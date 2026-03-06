@@ -18,6 +18,12 @@
     "lb": 1
   },
   {
+    "name": "Vodka",
+    "type": 0,
+    "rarity": 2,
+    "lb": 0
+  },
+  {
     "name": "Eishin Flash",
     "type": 0,
     "rarity": 2,
@@ -381,7 +387,7 @@
     "name": "Fine Motion",
     "type": 4,
     "rarity": 3,
-    "lb": 3
+    "lb": 4
   },
   {
     "name": "Mihono Bourbon",

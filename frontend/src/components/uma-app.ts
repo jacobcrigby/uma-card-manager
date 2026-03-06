@@ -19,8 +19,7 @@ export class UmaApp extends LitElement {
     .header {
       background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
       color: white;
-      padding: 2rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 2rem 2rem 0;
     }
 
     .header h1 {
@@ -128,16 +127,8 @@ export class UmaApp extends LitElement {
       background: #fafafa;
       color: #388e3c;
       font-weight: 600;
-    }
-
-    .tab.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: #4caf50;
+      padding-bottom: calc(0.75rem + 2px);
+      margin-bottom: -2px;
     }
   `;
 
@@ -315,7 +306,7 @@ export class UmaApp extends LitElement {
                     ? html`<div class="loading">Loading cards...</div>`
                     : this.activeTab === 'collection'
                       ? html`<card-list .cards=${this.enrichedCards} @card-updated=${this.handleCardAdded}></card-list>`
-                      : html`<simple-card-list .cards=${this.rawCards}></simple-card-list>`}
+                      : html`<simple-card-list .cards=${this.rawCards} .enrichedCards=${this.enrichedCards}></simple-card-list>`}
                 </div>
               </div>
             `}

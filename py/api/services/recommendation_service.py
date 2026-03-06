@@ -97,7 +97,7 @@ class RecommendationService:
         exclude_id = None
         selected: List[EnrichedCard] = []
 
-        if not no_support and total_cards < 6:
+        if not no_support and total_cards <= 6:
             try:
                 potential_borrows = get_best_cards_by_type_from_tierlist(
                     self.tierlist_path, my_cards
@@ -118,9 +118,13 @@ class RecommendationService:
                 for borrow_candidate in potential_borrows.values():
                     cand_id, _, cand_type, cand_score, cand_tier = borrow_candidate
 
-                    # Don't adjust type counts - borrowed card is ADDITIONAL to user's constraints
-                    # User asks for "1 Friend" means 1 Friend from their collection + borrowed card
                     sim_type_counts = type_counts.copy()
+
+                    # When total == 6, the borrowed card fills one of the requested type slots
+                    if total_cards == 6:
+                        if sim_type_counts.get(cand_type, 0) == 0:
+                            continue  # skip; this type wasn't requested
+                        sim_type_counts[cand_type] -= 1
 
                     # Simulate deck with this borrow_candidate
                     current_selected = select_best_cards_by_type(
