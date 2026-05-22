@@ -129,7 +129,8 @@ def run(args: argparse.Namespace) -> int:
     cards = load_enriched_cards(args.input)
     markdown = generate_markdown(cards)
 
-    # Write to file unless stdout-only
+    # Write to file when: (a) stdout mode not requested, or
+    # (b) a non-default output path was explicitly given (write + echo to stdout).
     if (
         not args.stdout
         or args.output

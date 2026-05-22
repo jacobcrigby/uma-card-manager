@@ -19,13 +19,27 @@ export class ApiClient {
   private baseUrl = '/api/v1';
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
+    let response: Response;
+    try {
+      response = await fetch(`${this.baseUrl}${endpoint}`, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error('Request timed out after 30 s');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -36,7 +50,11 @@ export class ApiClient {
       return undefined as T;
     }
 
-    return response.json();
+    try {
+      return await response.json();
+    } catch {
+      throw new Error(`API error: response was not valid JSON`);
+    }
   }
 
   async getCards(): Promise<CardResponse[]> {

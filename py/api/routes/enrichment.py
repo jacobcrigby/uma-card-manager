@@ -8,7 +8,7 @@ from ..services.enrichment_service import EnrichmentService
 
 router = APIRouter(prefix="/enrich", tags=["enrichment"])
 
-#Initialize service
+# Initialize service
 DATA_DIR = Path(__file__).resolve().parent.parent.parent.parent
 enrichment_service = EnrichmentService(DATA_DIR)
 

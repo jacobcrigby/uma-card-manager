@@ -82,9 +82,10 @@ def run(args: argparse.Namespace) -> int:
                 output=base / "my_cards_enriched.json",
                 stdout=False,
                 pretty=True,
+                force=False,
             )
             print("Re-enriching cards with the updated tierlist...")
-            enrich.run(enrich_args)  # type: ignore[arg-type]
+            enrich.run(enrich_args)
             print("Update complete: cards re-enriched.")
         except Exception as e:
             print(f"warning: failed to re-enrich cards: {e}", file=sys.stderr)
