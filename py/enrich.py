@@ -17,6 +17,7 @@ The original my_cards.json is never modified.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from dataclasses import dataclass
@@ -117,8 +118,9 @@ def enrich_cards(
         if tier_card is None:
             # No tierlist entry found for this card (e.g., Friend cards).
             # Include it anyway without score/tier so it's available for deck building.
-            # Assign a synthetic ID based on hash of (name, type, rarity)
-            synthetic_id = 40000 + (hash((name, ctype, rarity)) % 10000)
+            # Use a deterministic hash (not Python's hash(), which is PYTHONHASHSEED-randomised).
+            _digest = hashlib.md5(f"{name}|{ctype}|{rarity}".encode()).digest()
+            synthetic_id = 40000 + (int.from_bytes(_digest[:4], "big") % 10000)
             out["id"] = synthetic_id
             print(
                 f"info: no tierlist match for card "
